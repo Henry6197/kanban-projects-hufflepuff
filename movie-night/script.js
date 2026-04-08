@@ -213,3 +213,5 @@ document.getElementById("filter-genre").addEventListener("change", handleFilterC
 loadMovies();
 updateStats();
 renderMovies();
+
+// ★ <-- Jojo reference
