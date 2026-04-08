@@ -13,7 +13,7 @@ function saveMovies() {
 }
 
 function loadMovies() {
-  // BUG #2: wrong key — saves as "movienight_v1" but loads from "movie_night"
+  // BUG #2: key save & get issues?
   const stored = localStorage.getItem("movie_night");
   if (stored) {
     movies = JSON.parse(stored);
@@ -52,8 +52,7 @@ function renderStars(movieId, currentRating) {
   const container = document.createElement("div");
   container.className = "star-rating";
 
-  // BUG #3: loop runs from 1 to 6 (i <= 5 is correct, but <= renders 0-4 = 5 stars,
-  // however this is written as i <= rating+1 which renders too many filled stars)
+  // BUG #3: loop issues!!!
   for (let i = 1; i <= 5; i++) {
     const star = document.createElement("span");
     star.className = "star" + (i <= currentRating + 1 ? " filled" : "");  // BUG: +1 causes extra filled star
@@ -89,8 +88,7 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
   }
 
   // Status filter
-  // BUG #4: movie.watched is a boolean (true/false) but we compare to strings
-  // "watched" and "unwatched" — the comparison is wrong
+  // BUG #4: movie.watched has issues here...
   if (statusFilter === "watched") {
     visible = visible.filter(m => m.watched === "true");    // BUG: should be === true
   } else if (statusFilter === "unwatched") {
@@ -167,8 +165,7 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
 }
 
 // ── Form Submit ───────────────────────────────
-// BUG #1: listener attached to wrong ID — "add-movie-form" doesn't exist
-// The actual form id is "movie-form" — this silently does nothing
+// BUG #1: This submit button doesn't work!!!???
 document.getElementById("add-movie-form").addEventListener("submit", (e) => {
   e.preventDefault();
 

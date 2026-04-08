@@ -5,7 +5,7 @@
 // ── Data ──────────────────────────────────────
 let subjects = [];
 let sessions  = [];
-let totalXP   = "0";          // BUG #3: initialized as string — causes XP concatenation
+let totalXP   = "0";          // BUG #3: XP concatenation issue
 
 const XP_PER_LEVEL = 100;
 const SAVE_KEY     = "studyquest_v1";
@@ -53,8 +53,7 @@ function updateXPDisplay() {
 // ── Subject Helpers ───────────────────────────
 function getSubjectById(id) {
   // BUG #4: comparing number id to string value from select element
-  // subject.id is a Number, but select option values are Strings
-  // Using === means this will always return undefined when called from session log
+  // Maybe there's some issue with strict and loose equality...?
   return subjects.find(s => s.id === id);
 }
 
@@ -126,7 +125,7 @@ function renderSessions(filter = "all") {
   visible.forEach(session => {
     // BUG #4 in action: getSubjectById receives a number but stores as number,
     // BUT the select option value is a string — so subjectId was stored
-    // as a string from the form, and this lookup fails with ===
+    // as a string from the form, and this lookup fails for some reason...?
     const subject = getSubjectById(session.subjectId);
     const name    = subject ? subject.name  : "Unknown";
     const color   = subject ? subject.color : "#888";
@@ -168,7 +167,7 @@ subjectForm.addEventListener("submit", (e) => {
   document.getElementById("subject-name").value = "";
 });
 
-// Log Session — BUG #1: missing e.preventDefault()
+// Log Session — BUG #1: missing e.preventDefault() or some other fix...?
 const sessionForm = document.getElementById("session-form");
 sessionForm.addEventListener("submit", (e) => {
   const subjectId = document.getElementById("session-subject").value;
@@ -178,7 +177,7 @@ sessionForm.addEventListener("submit", (e) => {
   if (!subjectId || !minutes || minutes < 1) return;
 
   const xpEarned = minutes;
-  totalXP = totalXP + xpEarned;    // BUG #3: "0" + 45 = "045" (string concat)
+  totalXP = totalXP + xpEarned;    // BUG #3: XP is calculated incorrectly?
 
   sessions.unshift({ subjectId, minutes, note, xpEarned, date: Date.now() });
   saveData();

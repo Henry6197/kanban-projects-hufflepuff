@@ -13,7 +13,7 @@ function saveTakes() {
 }
 
 function loadTakes() {
-  // BUG #2: reads from wrong key — saves as "hottakes_v1", loads from "hot_takes_v1"
+  // BUG #2: key has trouble reading the necessary info...
   const stored = localStorage.getItem("hot_takes_v1");
   if (stored) {
     takes = JSON.parse(stored);
@@ -48,7 +48,7 @@ function sortTakes(list, sortBy) {
     return copy.sort((a, b) => b.date - a.date);
   }
   if (sortBy === "hottest") {
-    // BUG #4: sort is ascending (lowest votes first) — should be descending
+    // BUG #4: sort is WRONG???
     return copy.sort(
       (a, b) =>
         (a.votes.agree + a.votes.disagree) - (b.votes.agree + b.votes.disagree)
@@ -87,8 +87,7 @@ function renderTakes() {
   visible.forEach(take => {
     const total = take.votes.agree + take.votes.disagree;
 
-    // BUG #3: wrong denominator — divides agree by agree+agree instead of agree+disagree
-    // This makes agreePct always = 50% when there are any agree votes
+    // BUG #3: agreePct always = 50% when there are any agree votes
     const agreePct = total > 0
       ? Math.round((take.votes.agree / (take.votes.agree + take.votes.agree)) * 100)
       : 0;
