@@ -14,7 +14,7 @@ function saveMovies() {
 
 function loadMovies() {
   // BUG #2: key save & get issues?
-  const stored = localStorage.getItem("movie_night");
+  const stored = localStorage.getItem(SAVE_KEY);
   if (stored) {
     movies = JSON.parse(stored);
   }
@@ -48,16 +48,17 @@ function updateStats() {
 }
 
 // ── Render Stars ──────────────────────────────
+
 function renderStars(movieId, currentRating) {
   const container = document.createElement("div");
   container.className = "star-rating";
 
-  // BUG #3: loop issues!!!
   for (let i = 1; i <= 5; i++) {
     const star = document.createElement("span");
-    star.className = "star" + (i <= currentRating + 1 ? " filled" : "");  // BUG: +1 causes extra filled star
+    star.className = "star" + (i <= currentRating ? " filled" : "");
     star.textContent = "★";
     star.dataset.value = i;
+
     star.addEventListener("click", () => {
       const movie = movies.find(m => m.id === movieId);
       if (movie) {
@@ -69,11 +70,13 @@ function renderStars(movieId, currentRating) {
         );
       }
     });
+
     container.appendChild(star);
   }
 
   return container;
 }
+
 
 // ── Render Movies ─────────────────────────────
 function renderMovies(statusFilter = "all", genreFilter = "all") {
