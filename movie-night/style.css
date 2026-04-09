@@ -284,11 +284,11 @@ input:focus, select:focus {
   font-size: 1.1rem;
   cursor: pointer;
   transition: transform 0.1s;
-  color: var(--surface2);   /* BUG: matches card background — stars are invisible */
+  color: var(--gold-dim);   /* BUG: matches card background — stars are invisible */
 }
 
 .star.filled {
-  color: var(--surface2);   /* BUG: same as unfilled — filled stars look identical */
+  color: var(--gold);   /* BUG: same as unfilled — filled stars look identical */
 }
 
 .star:hover {
