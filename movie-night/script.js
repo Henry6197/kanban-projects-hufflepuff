@@ -14,7 +14,7 @@ function saveMovies() {
 
 function loadMovies() {
   // BUG #2: key save & get issues?
-  const stored = localStorage.getItem("movie_night");
+  const stored = localStorage.getItem(SAVE_KEY);
   if (stored) {
     movies = JSON.parse(stored);
   }
