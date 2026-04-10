@@ -93,18 +93,28 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
   // Status filter
   // BUG #4: movie.watched has issues here...
   if (statusFilter === "watched") {
-    visible = visible.filter(m => m.watched === "true");    // BUG: should be === true
+    visible = visible.filter(m => m.watched === true);    // BUG: should be === true
   } else if (statusFilter === "unwatched") {
-    visible = visible.filter(m => m.watched === "false");   // BUG: should be === false
+    visible = visible.filter(m => m.watched === false);   // BUG: should be === false
   }
 
   if (visible.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <span class="big-icon">🍿</span>
-        No movies here yet. Add some!
-      </div>
-    `;
+    if (genreFilter === "all"){
+      grid.innerHTML = `
+        <div class="empty-state">
+          <span class="big-icon">🎬</span>
+          Your watchlist is empty — add your first movie!
+        </div>
+      `;    
+    } else {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <span class="big-icon">${getEmoji(genreFilter)}</span>
+          No ${genreFilter} movies found. Try a different filter.
+        </div>
+      `;
+    }
+
     return;
   }
 
