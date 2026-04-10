@@ -37,7 +37,7 @@ function getEmoji(genre) {
 }
 
 // ── Stats ─────────────────────────────────────
-function updateStats() {
+function updateStats() { 
   const total     = movies.length;
   const watched   = movies.filter(m => m.watched).length;
   const unwatched = total - watched;
@@ -90,9 +90,9 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
   // Status filter
   // BUG #4: movie.watched has issues here...
   if (statusFilter === "watched") {
-    visible = visible.filter(m => m.watched === "true");    // BUG: should be === true
+    visible = visible.filter(m => m.watched === true);    // BUG: should be === true
   } else if (statusFilter === "unwatched") {
-    visible = visible.filter(m => m.watched === "false");   // BUG: should be === false
+    visible = visible.filter(m => m.watched === false );   // BUG: should be === false
   }
 
   if (visible.length === 0) {
