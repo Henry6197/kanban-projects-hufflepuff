@@ -7,6 +7,17 @@ let movies = [];
 
 const SAVE_KEY = "movienight_v1";
 
+function formatWatchedDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 // ── Storage ───────────────────────────────────  dhgdhgdsgds   
 function saveMovies() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(movies));
@@ -17,6 +28,17 @@ function loadMovies() {
   const stored = localStorage.getItem(SAVE_KEY);
   if (stored) {
     movies = JSON.parse(stored);
+
+    // Backfill watchedOn once for legacy watched movies so refreshes stay stable.
+    let changed = false;
+    movies.forEach(movie => {
+      if (movie.watched && !movie.watchedOn) {
+        movie.watchedOn = formatWatchedDate(new Date());
+        changed = true;
+      }
+    });
+
+    if (changed) saveMovies();
   }
 }
 
@@ -135,7 +157,7 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
       </div>
       <div class="movie-footer">
         <button class="watch-btn ${movie.watched ? "active" : ""}" data-id="${movie.id}">
-          ${movie.watched ? "✅ Watched" : "Mark Watched"}
+          ${movie.watched ? (movie.watchedOn ? "Watched on " + movie.watchedOn : "Watched") : "Mark Watched"}
         </button>
         <button class="delete-btn" data-id="${movie.id}" title="Remove">🗑️</button>
       </div>
@@ -153,6 +175,7 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
       const movie = movies.find(m => m.id === btn.dataset.id);
       if (movie) {
         movie.watched = !movie.watched;
+        movie.watchedOn = movie.watched ? formatWatchedDate(new Date()) : null;
         saveMovies();
         updateStats();
         renderMovies(
@@ -197,6 +220,7 @@ document.getElementById("add-movie-form").addEventListener("submit", (e) => {
     note,
     rating:  0,
     watched: false,
+    watchedOn: null,
   });
 
   saveMovies();
