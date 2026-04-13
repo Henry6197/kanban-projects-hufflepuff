@@ -32,8 +32,23 @@ const genreEmoji = {
   other:     "🎬",
 };
 
+const genreColor = {
+  action: "red",
+  comedy: 'yellow',
+  horror: 'purple',
+  'sci-fi': 'blue',
+  drama: 'teal',
+  thriller: 'orange',
+  animation: 'pink',
+  other: 'brown',
+};
+
 function getEmoji(genre) {
   return genreEmoji[genre] || "🎬";
+}
+
+function getColor(genre) {
+  return genreColor[genre];
 }
 
 // ── Stats ─────────────────────────────────────
@@ -123,7 +138,7 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
     card.className = "movie-card" + (movie.watched ? " watched" : "");
 
     card.innerHTML = `
-      <div class="movie-poster">
+      <div class="movie-poster" style="background-color: ${getColor(movie.genre)}">
         <span>${getEmoji(movie.genre)}</span>
         <span class="movie-genre-tag">${movie.genre}</span>
       </div>
