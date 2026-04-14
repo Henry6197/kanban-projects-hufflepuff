@@ -182,12 +182,37 @@ input:focus, select:focus {
 .controls-right {
   display: flex;
   gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
  
 .controls-right select {
   width: auto;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem;
+}
+
+.btn-pick-random {
+  border: 1px solid var(--gold-dim);
+  background: color-mix(in srgb, var(--gold) 16%, var(--surface2));
+  color: var(--text);
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.15s, background 0.15s;
+}
+
+.btn-pick-random:hover:enabled {
+  transform: translateY(-1px);
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 26%, var(--surface2));
+}
+
+.btn-pick-random:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
  
 /* ── Movie Grid ──────────────────────────────── */
@@ -219,6 +244,11 @@ input:focus, select:focus {
 .movie-card:hover {
   transform: translateY(-3px);
   border-color: var(--gold-dim);
+}
+
+.movie-card.picked {
+  border-color: var(--gold);
+  box-shadow: inset 0 4px 0 var(--genre-color), 0 0 0 2px color-mix(in srgb, var(--gold) 35%, transparent);
 }
  
 .movie-card.watched {

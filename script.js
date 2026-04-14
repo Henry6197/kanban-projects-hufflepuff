@@ -6,6 +6,7 @@
  
 // ── Data ──────────────────────────────────────
 let movies = [];
+let pickedMovieId = null;
  
 const SAVE_KEY = "movienight_v1";
  
@@ -72,10 +73,20 @@ function updateStats() {
   const total     = movies.length;
   const watched   = movies.filter(m => m.watched).length;
   const unwatched = total - watched;
+  const ratedMovies = movies.filter(m => Number(m.rating) > 0);
+  const avgRating = ratedMovies.length
+    ? (ratedMovies.reduce((sum, movie) => sum + Number(movie.rating), 0) / ratedMovies.length).toFixed(1)
+    : "0.0";
+  const pickBtn = document.getElementById("pick-random-btn");
  
   document.getElementById("total-count").textContent    = total;
   document.getElementById("watched-count").textContent  = watched;
   document.getElementById("unwatched-count").textContent = unwatched;
+  document.getElementById("avg-rating").textContent = avgRating;
+
+  if (pickBtn) {
+    pickBtn.disabled = unwatched === 0;
+  }
 }
  
 // ── Render Stars ──────────────────────────────
@@ -95,6 +106,7 @@ function renderStars(movieId, currentRating) {
       if (movie) {
         movie.rating = i;
         saveMovies();
+        updateStats();
         renderMovies(
           document.getElementById("filter-status").value,
           document.getElementById("filter-genre").value
@@ -172,7 +184,8 @@ function renderMovies(statusFilter = "all", genreFilter = "all", sortBy = null) 
  
   visible.forEach(movie => {
   const card = document.createElement("div");
-  card.className = "movie-card genre-" + movie.genre + (movie.watched ? " watched" : "");
+  card.className = "movie-card genre-" + movie.genre + (movie.watched ? " watched" : "") + (movie.id === pickedMovieId ? " picked" : "");
+  card.dataset.movieId = movie.id;
  
   if (movie.isEditing) {
     // --- EDIT MODE LAYOUT ---
@@ -264,6 +277,11 @@ grid.querySelectorAll(".btn-cancel").forEach(btn => {
       if (movie) {
         movie.watched = !movie.watched;
         movie.watchedOn = movie.watched ? formatWatchedDate(new Date()) : null;
+
+        if (movie.watched && pickedMovieId === movie.id) {
+          pickedMovieId = null;
+        }
+
         saveMovies();
         updateStats();
         renderMovies(
@@ -282,6 +300,10 @@ grid.querySelectorAll(".btn-cancel").forEach(btn => {
       const shouldDelete = window.confirm(`Delete \"${movieTitle}\" from your watchlist?`);
 
       if (!shouldDelete) return;
+
+      if (pickedMovieId === btn.dataset.id) {
+        pickedMovieId = null;
+      }
 
       movies = movies.filter(m => m.id !== btn.dataset.id);
       saveMovies();
@@ -343,6 +365,32 @@ function handleFilterChange() {
 document.getElementById("filter-status").addEventListener("change", handleFilterChange);
 document.getElementById("filter-genre").addEventListener("change", handleFilterChange);
 document.getElementById("sort-movies").addEventListener("change", handleFilterChange);
+
+document.getElementById("pick-random-btn").addEventListener("click", () => {
+  const unwatchedMovies = movies.filter(movie => !movie.watched);
+  const statusSelect = document.getElementById("filter-status");
+  const genreSelect = document.getElementById("filter-genre");
+
+  if (unwatchedMovies.length === 0) {
+    pickedMovieId = null;
+    renderMovies(statusSelect.value, genreSelect.value);
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * unwatchedMovies.length);
+  pickedMovieId = unwatchedMovies[randomIndex].id;
+
+  if (statusSelect.value === "watched") {
+    statusSelect.value = "unwatched";
+  }
+
+  renderMovies(statusSelect.value, genreSelect.value);
+
+  const pickedCard = document.querySelector(`.movie-card[data-movie-id="${pickedMovieId}"]`);
+  if (pickedCard) {
+    pickedCard.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
  
 // ── Init ──────────────────────────────────────
 loadMovies();
