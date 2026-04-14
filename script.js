@@ -38,6 +38,12 @@ function loadMovies() {
         movie.watchedOn = formatWatchedDate(new Date());
         changed = true;
       }
+
+      if (!movie.createdAt) {
+        const fallbackFromId = Number(movie.id);
+        movie.createdAt = Number.isFinite(fallbackFromId) ? fallbackFromId : Date.now();
+        changed = true;
+      }
     });
  
     if (changed) saveMovies();
@@ -55,6 +61,7 @@ const genreEmoji = {
   animation: "✏️",
   other:     "🎬",
 };
+
  
 function getEmoji(genre) {
   return genreEmoji[genre] || "🎬";
@@ -103,9 +110,11 @@ function renderStars(movieId, currentRating) {
  
  
 // ── Render Movies ─────────────────────────────
-function renderMovies(statusFilter = "all", genreFilter = "all") {
+function renderMovies(statusFilter = "all", genreFilter = "all", sortBy = null) {
   const grid = document.getElementById("movie-grid");
   grid.innerHTML = "";
+
+  const activeSort = sortBy || document.getElementById("sort-movies")?.value || "newest";
  
   let visible = [...movies];
  
@@ -121,6 +130,25 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
   } else if (statusFilter === "unwatched") {
     visible = visible.filter(m => m.watched === false);   // BUG: should be === false
   }
+
+  visible.sort((a, b) => {
+    const aCreated = Number(a.createdAt) || Number(a.id) || 0;
+    const bCreated = Number(b.createdAt) || Number(b.id) || 0;
+
+    if (activeSort === "oldest") {
+      return aCreated - bCreated;
+    }
+
+    if (activeSort === "title-az") {
+      return (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
+    }
+
+    if (activeSort === "rating-high") {
+      return (b.rating || 0) - (a.rating || 0) || (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
+    }
+
+    return bCreated - aCreated;
+  });
  
   if (visible.length === 0) {
     if (genreFilter === "all"){
@@ -144,7 +172,7 @@ function renderMovies(statusFilter = "all", genreFilter = "all") {
  
   visible.forEach(movie => {
   const card = document.createElement("div");
-  card.className = "movie-card" + (movie.watched ? " watched" : "");
+  card.className = "movie-card genre-" + movie.genre + (movie.watched ? " watched" : "");
  
   if (movie.isEditing) {
     // --- EDIT MODE LAYOUT ---
@@ -249,6 +277,12 @@ grid.querySelectorAll(".btn-cancel").forEach(btn => {
   // Delete
   grid.querySelectorAll(".delete-btn").forEach(btn => {
     btn.addEventListener("click", () => {
+      const movie = movies.find(m => m.id === btn.dataset.id);
+      const movieTitle = movie?.title || "this movie";
+      const shouldDelete = window.confirm(`Delete \"${movieTitle}\" from your watchlist?`);
+
+      if (!shouldDelete) return;
+
       movies = movies.filter(m => m.id !== btn.dataset.id);
       saveMovies();
       updateStats();
@@ -272,8 +306,11 @@ document.getElementById("add-movie-form").addEventListener("submit", (e) => {
  
   if (!title) return;
  
+  const createdAt = Date.now();
+
   movies.unshift({
-    id:      String(Date.now()),
+    id:      String(createdAt),
+    createdAt,
     title,
     genre,
     year:    year ? parseInt(year) : null,
@@ -305,6 +342,7 @@ function handleFilterChange() {
  
 document.getElementById("filter-status").addEventListener("change", handleFilterChange);
 document.getElementById("filter-genre").addEventListener("change", handleFilterChange);
+document.getElementById("sort-movies").addEventListener("change", handleFilterChange);
  
 // ── Init ──────────────────────────────────────
 loadMovies();

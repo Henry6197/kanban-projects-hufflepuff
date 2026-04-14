@@ -199,14 +199,22 @@ input:focus, select:focus {
  
 /* ── Movie Card ──────────────────────────────── */
 .movie-card {
+  --genre-color: var(--border);
   background: var(--surface);
   border: 1px solid var(--border);
+  box-shadow: inset 0 4px 0 var(--genre-color);
   border-radius: var(--radius);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: transform 0.15s, border-color 0.15s;
 }
+
+.movie-card.genre-action { --genre-color: #e63946; }
+.movie-card.genre-comedy { --genre-color: #f5c518; }
+.movie-card.genre-horror { --genre-color: #7b2cbf; }
+.movie-card.genre-sci-fi { --genre-color: #3a86ff; }
+.movie-card.genre-drama { --genre-color: #2a9d8f; }
  
 .movie-card:hover {
   transform: translateY(-3px);
@@ -219,7 +227,7 @@ input:focus, select:focus {
  
 .movie-poster {
   height: 140px;
-  background: var(--surface2);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--genre-color) 30%, var(--surface2)), var(--surface2));
   display: flex;
   align-items: center;
   justify-content: center;
